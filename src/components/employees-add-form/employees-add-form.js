@@ -8,14 +8,43 @@ class EmployeesAddForm extends Component {
         this.state = {
             name: '',
             salary: '',
+            formErrors: {name: '', salary: ''},
+            nameValid: false,
+            salaryValid: false,
+            formValid: false
         } 
     }
 
     onValueChange = (e) => {
-        this.setState({
-           [e.target.name] : e.target.value
-        })
+        const name = e.target.name;
+  const value = e.target.value;
+  this.setState({[name]: value}, 
+                () => { this.validateField(name, value) });
     }
+
+    validateField(fieldName, value) {
+        let fieldValidationErrors = this.state.formErrors;
+        let nameValid = this.state.nameValid;
+        let salaryValid = this.state.salaryValid;
+      switch(fieldName) {
+          case 'name':
+            nameValid = value.length >= 1;
+            break;
+          case 'salary':
+            salaryValid = value.length >= 1;
+            break;
+          default:
+            break;
+        }
+        this.setState({formErrors: fieldValidationErrors,
+                        nameValid: nameValid,
+                        salaryValid: salaryValid
+                      }, this.validateForm);
+      }
+      validateForm() {
+        this.setState({formValid: this.state.nameValid &&
+                                  this.state.salaryValid}); 
+      }
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -34,7 +63,7 @@ class EmployeesAddForm extends Component {
                 <h3>Добавьте нового сотрудника</h3>
                 <form
                     className="add-form d-flex"
-                    onSubmit = {this.onSubmit}>    
+                    onSubmit = {this.onSubmit}>
                     <input type="text"
                         className="form-control new-post-label"
                         placeholder="Как его зовут?"
@@ -48,7 +77,8 @@ class EmployeesAddForm extends Component {
                         value={salary} 
                         onChange={this.onValueChange}/>
     
-                    <button type="submit"
+                    <button type="submit" 
+                        disabled={!this.state.formValid}
                         className="btn btn-outline-light">Добавить</button>
                 </form>
             </div>
